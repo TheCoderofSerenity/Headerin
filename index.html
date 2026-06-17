@@ -566,12 +566,12 @@ section,footer,.cta-section{padding:64px 20px}
       <div class="booking-form-wrap fade-up s2">
         <form id="bookingForm" onsubmit="submitForm(event)">
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" placeholder="Rahul Kapoor" required></div>
-            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="hello@company.com" required></div>
+            <div class="form-group"><label class="form-label">Name</label><input id="name" type="text" class="form-input" placeholder="Rahul Kapoor" required></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="email" type="email" class="form-input" placeholder="hello@company.com" required></div>
           </div>
-          <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input type="tel" class="form-input" placeholder="+91 98765 43210"></div>
+          <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input id="phone" type="tel" class="form-input" placeholder="+91 98765 43210"></div>
           <div class="form-group"><label class="form-label">Service Needed</label>
-            <select class="form-input">
+            <select id="service" class="form-input">
               <option value="">Select a service...</option>
               <option>Website Development</option>
               <option>Graphic Design</option>
@@ -580,7 +580,7 @@ section,footer,.cta-section{padding:64px 20px}
             </select>
           </div>
           <div class="form-group"><label class="form-label">Budget Range</label>
-            <select class="form-input">
+            <select id="budget" class="form-input">
               <option value="">Select your budget...</option>
               <option>₹5,000 – ₹15,000</option>
               <option>₹15,000 – ₹50,000</option>
@@ -588,7 +588,7 @@ section,footer,.cta-section{padding:64px 20px}
               <option>₹1,00,000+</option>
             </select>
           </div>
-          <div class="form-group"><label class="form-label">Project Details</label><textarea class="form-input" rows="4" placeholder="Describe your project, goals, and any specific requirements..."></textarea></div>
+          <div class="form-group"><label class="form-label">Project Details</label><textarea id="message" class="form-input" rows="4" placeholder="Describe your project, goals, and any specific requirements..."></textarea></div>
           <button type="submit" class="form-submit" id="submitBtn">Send Project Brief →</button>
         </form>
       </div>
@@ -631,15 +631,41 @@ section,footer,.cta-section{padding:64px 20px}
     </div>
   </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
+const sb = window.supabase.createClient(
   "https://mcgiqeowrqaescfeuthb.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jZ2lxZW93cnFhZXNjZmV1dGhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODc5NDIsImV4cCI6MjA5NzI2Mzk0Mn0._9Gel6N5-jdcaUltI7uIL0SFBk3RQhGCh1fmBAB0CkE"
 );
+console.log(sb);
+document
+  .getElementById("bookingForm")
+  .addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const service = document.getElementById("service").value;
+    const message = document.getElementById("message").value;
+
+    const { data, error } = await sb
+      .from("leads")
+      .insert([{ name, email, phone, service, message }]);
+
+    console.log("Data:", data);
+    console.log("Error:", error);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Form submitted successfully!");
+    }
+});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 document
   .getElementById("bookingForm")
@@ -653,7 +679,7 @@ document
     const service = document.getElementById("service").value;
     const message = document.getElementById("message").value;
 
-    const { error } = await supabase
+    const { error } = await sb
       .from("leads")
       .insert([
         {
